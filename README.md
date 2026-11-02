@@ -1,5 +1,3 @@
-<div align="center">
-
 # Indian Startup Funding: Exploratory Data Analysis
 
 **SWYNEX Technologies · Data Analyst Internship · Task 2**
@@ -12,36 +10,35 @@
 
 *A cleaned startup-funding table audited for outliers, corrected where evidence exists, and analysed by year, industry, city, investor, funding stage and startup.*
 
-</div>
-
 ---
 
 ## Table of Contents
 1. [Project Overview](#1-project-overview)
 2. [Dataset](#2-dataset)
 3. [Repository Structure](#3-repository-structure)
-4. [Data Audit (Before Analysis)](#4-data-audit-before-analysis)
-5. [Analysis Workflow](#5-analysis-workflow)
-6. [Key Findings](#6-key-findings)
-7. [Before vs After](#7-before-vs-after)
-8. [Final Data Dictionary](#8-final-data-dictionary)
-9. [Decisions & Assumptions](#9-decisions--assumptions)
-10. [Limitations](#10-limitations)
-11. [How to Reproduce](#11-how-to-reproduce)
-12. [Key Learnings](#12-key-learnings)
-13. [Next Steps](#13-next-steps)
-14. [Author](#14-author)
+4. [Key Visuals](#key-visuals)
+5. [Data Audit (Before Analysis)](#4-data-audit-before-analysis)
+6. [Analysis Workflow](#5-analysis-workflow)
+7. [Key Findings](#6-key-findings)
+8. [Before vs After](#7-before-vs-after)
+9. [Final Data Dictionary](#8-final-data-dictionary)
+10. [Decisions & Assumptions](#9-decisions--assumptions)
+11. [Limitations](#10-limitations)
+12. [How to Reproduce](#11-how-to-reproduce)
+13. [Key Learnings](#12-key-learnings)
+14. [Next Steps](#13-next-steps)
+15. [Author](#14-author)
 
 ---
 
 ## 1. Project Overview
 
-**Objective:** Use the cleaned dataset from Task 1 to understand Indian startup funding: how funding changed over time, which industries, cities, investors and funding stages matter most, and which startups raised the most money.
+**Objective:** Use the cleaned dataset from Task 1 to understand Indian startup funding: how funding changed over time, which industries, cities, investors and funding stages matter most, and which startups attracted the largest rounds.
 
-**Approach:** The analysis was done in a Google Colab notebook with `pandas` and `matplotlib`. Every section follows the same pattern: **check the data first, analyse second, state the findings and caveats third.** Each section also names the next step, so the notebook reads as one connected argument.
+**Approach:** The analysis was done in a Google Colab notebook with `pandas` and `matplotlib`. Every section follows the same pattern: **check the data first, analyse second, state the findings and caveats next to each result.**
 
 **Outcome:**
-- **11 wrong funding amounts** (rupee values stored as USD, plus data-entry errors) were found through outlier detection, checked against public news reports and corrected. This removed about **$5.4B** of inflated funding from the total.
+- **11 wrong funding amounts** (rupee values stored as USD, plus data-entry errors) were found through outlier detection, checked against public news reports and corrected. This removed about **$5.46B** from the total before the fix.
 - **Six analyses** (year, industry, city, investor, funding stage, startup) with findings and caveats written next to each result.
 - An **analysis-ready table of 3,044 rows × 16 columns** (`startup_funding_eda.csv`) that keeps both the corrected and the original amount, ready for the dashboard stage.
 
@@ -68,8 +65,31 @@ SWYNEX-Startup-Funding-EDA/
 ├── cleaned_startup_funding.csv                              # Input: Task 1 output
 ├── startup_funding_eda.csv                                  # Final analysis-ready data (16 columns)
 ├── Indian_Startup_Funding_Exploratory_Data_Analysis.ipynb   # Full notebook with every step
-└── README.md                                                # This document
+├── README.md                                                # This document
+└── images/                                                  # Charts used in the README
 ```
+
+---
+
+## Key Visuals
+
+These charts summarize the core findings from the notebook and are added here for quick visibility in the repository.
+
+### Year-wise total funding
+
+![Year-wise total funding](images/yearly_funding.svg)
+
+### Top cities by funding
+
+![Top cities by funding](images/top_cities.svg)
+
+### Top industries by funding
+
+![Top industries by funding](images/top_industries.svg)
+
+### Top investors by number of deals
+
+![Top investors by number of deals](images/top_investors.svg)
 
 ---
 
@@ -111,9 +131,10 @@ df.describe()
 
 This is the most important step of the project, because wrong amounts change every total that follows.
 
-**2.1 Spot-check the largest values.** The 40 largest amounts were listed, and every deal above $100M was flagged as `suspect` (**56 rows**). Seed/Angel deals of $50M or more were listed separately, because a seed round that large is very unlikely: Digital Mall Asia ($220M), FreshVnF ($140M), Shape ($100M), Rein Games ($50M) and Dhruva Space ($50M). `suspect` is a "look here" list only; it also contains real large deals such as Flipkart and Udaan.
+**2.1 Spot-check the largest values.** The 40 largest amounts were listed, and every deal above $100M was flagged as `suspect` (**56 rows**). Seed/Angel deals of $50M or more were listed separately because they can be plausible but are still worth checking.
 
-**2.2 Outliers within each investment type.** A normal deal size differs by round, so a flat cut-off is unfair. Amounts above `Q3 + 3 × IQR` were flagged **within each investment type**. The multiplier 3 (instead of the usual 1.5) keeps only extreme values.
+**2.2 Outliers within each investment type.** A normal deal size differs by round, so a flat cut-off is unfair. Amounts above `Q3 + 3 × IQR` were flagged **within each investment type**.
+
 ```python
 def flag(g):
     q1, q3 = g.quantile(.25), g.quantile(.75)
@@ -133,7 +154,7 @@ Result: **118 rows flagged** (Private Equity 82, Seed/Angel 28, Series B 3, Othe
 
 **2.4 Mark rows to verify.** Ten rows with unrealistic amounts were marked `to_verify`.
 
-**2.5 Fix the wrong amounts.** Each of the 10 rows was checked against public news reports from 2018 and 2019. Most were **rupee amounts stored as USD** (for example, Rs 22 Cr shown as $220M); Recykal and Kuvera were data-entry errors. The corrected USD value goes into `amount_usd`, and the original value is preserved in `amount_original`.
+**2.5 Fix the wrong amounts.** Each of the 10 rows was checked against public news reports from 2018 and 2019. Most were **rupee amounts stored as USD**; Recykal and Kuvera were data-entry errors.
 
 | Startup | Original amount | Corrected amount | Reason |
 |---|---:|---:|---|
@@ -145,12 +166,12 @@ Result: **118 rows flagged** (Private Equity 82, Seed/Angel 28, Series B 3, Othe
 | Shape | $100,000,000 | $200,000 | $200K reported |
 | Dhruva Space | $50,000,000 | $700,000 | Rs 5 Cr |
 | Rein Games | $50,000,000 | $700,000 | Rs 5 Cr |
-| Kuvera | $45,000,000 | $4,500,000 | $4.5M reported (data-entry error) |
-| Recykal | $26,000,000 | $2,000,000 | $2M reported (data-entry error) |
-| Furtados School of Music | $200,000,000 | $2,800,000 | Rs 20 Cr (not flagged by the IQR rule because its group is tiny, so it was corrected by name) |
+| Kuvera | $45,000,000 | $4,500,000 | $4.5M reported |
+| Recykal | $26,000,000 | $2,000,000 | $2M reported |
+| Furtados School of Music | $200,000,000 | $2,800,000 | Rs 20 Cr |
 
 ```python
-if 'amount_original' not in df.columns:      # keep the original only on the first run
+if 'amount_original' not in df.columns:
     df['amount_original'] = df.amount_usd
 
 m = df.to_verify
@@ -160,150 +181,7 @@ df.loc[m, 'amount_usd'] = new
 ```
 The `assert` stops the notebook if a marked row has no correction, so nothing is changed silently. The 11 corrected rows carried about **$5.46B before** the fix and about **$0.08B after** it.
 
-**2.6 Re-check after the fixes.** The same IQR rule was run again and saved in a new column `outlier_after_fix`, so the first flags stay visible. **110 rows** remain flagged. Seed/Angel fell from 28 to 24 and Series B from 3 to 1. One row is new: Engineer.ai (Series A, $29.5M) is above the limit only because the Series A threshold dropped after Kuvera was corrected, so it was left unchanged. The 82 Private Equity rows are a mixed group that includes real large deals such as Flipkart and Paytm, so they were also left unchanged.
-
-### Step 3: Year-wise trend
-```python
-df['year'] = df.date.dt.year
-yr = df.groupby('year').agg(deals=('sr_no','count'),
-                            with_amount=('amount_usd','count'),
-                            total=('amount_usd','sum'),
-                            median=('amount_usd','median'))
-yr['missing_pct'] = (1 - yr.with_amount/yr.deals) * 100
-```
-The **median** is used next to the total because a few very large deals pull the total up. The share of deals with a missing amount is shown for each year so the reader can judge how complete each total is.
-
-| Year | Deals | With amount | Total funding | Median deal | Amount missing |
-|---|---:|---:|---:|---:|---:|
-| 2015 | 936 | 654 | $8.67B | $1.50M | 30% |
-| 2016 | 993 | 586 | $3.83B | $1.00M | 41% |
-| 2017 | 687 | 456 | $10.43B | $2.25M | 34% |
-| 2018 | 310 | 265 | $5.02B | $3.80M | 15% |
-| 2019 | 111 | 105 | $4.42B | $6.24M | 5% |
-| 2020 (Jan only) | 7 | 7 | $0.39B | $9.00M | 0% |
-
-A three-panel chart shows deals, total funding and median deal size side by side.
-
-### Step 4: Industry-wise funding
-Deals are grouped by `industry`. Only industries with **at least 10 deals that have an amount** are ranked, so that the median is reliable and one-off labels do not distort the list. `Unknown` industries are excluded.
-
-| Industry | Deals | With amount | Total funding | Median deal |
-|---|---:|---:|---:|---:|
-| eCommerce | 299 | 205 | $8.04B | $3.00M |
-| Consumer Internet | 941 | 589 | $6.25B | $1.00M |
-| Technology | 489 | 321 | $2.31B | $1.50M |
-| Finance | 62 | 57 | $1.93B | $6.00M |
-| FinTech | 16 | 16 | $1.36B | $10.00M |
-| Food & Beverage | 35 | 25 | $0.37B | $2.00M |
-| Healthcare | 70 | 44 | $0.28B | $2.10M |
-| Logistics | 32 | 23 | $0.24B | $6.00M |
-| EdTech | 20 | 18 | $0.19B | $0.89M |
-| Education | 24 | 19 | $0.10B | $1.50M |
-
-### Step 5: City-wise funding
-City labels were first checked for spelling variants, because variants would split one city into several rows. Clear typos, neighbourhoods and codes were mapped to their city in a **new column** `city_clean`; the original `city` column is untouched.
-```python
-city_fix = {'Kormangala':'Bengaluru', 'Andheri':'Mumbai', 'Chembur':'Mumbai',
-            'Taramani':'Chennai', 'Nw Delhi':'New Delhi', 'Kolkatta':'Kolkata',
-            'Ahemdabad':'Ahmedabad', 'Bhubneswar':'Bhubaneswar',
-            'San Jose,':'San Jose', 'SFO':'San Francisco', 'US':'USA'}
-df['city_clean'] = df.city.replace(city_fix)      # 13 rows changed
-```
-Labels that hold two cities (`Bengaluru and Gurugram`) or only a state (`Karnataka`) were left as they are, because the intended city cannot be known.
-
-| City | Deals | With amount | Total funding | Median deal |
-|---|---:|---:|---:|---:|
-| Bengaluru | 851 | 593 | $14.60B | $2.20M |
-| Mumbai | 575 | 409 | $4.83B | $2.00M |
-| Gurugram | 342 | 244 | $3.88B | $2.50M |
-| New Delhi | 463 | 270 | $3.15B | $1.00M |
-| Noida | 94 | 57 | $1.23B | $1.00M |
-| Chennai | 99 | 76 | $0.76B | $2.50M |
-| Pune | 112 | 77 | $0.62B | $1.30M |
-| Hyderabad | 100 | 73 | $0.38B | $1.00M |
-| Jaipur | 30 | 14 | $0.15B | $1.00M |
-| Ahmedabad | 41 | 29 | $0.12B | $1.00M |
-
-**Delhi NCR view.** `Delhi NCR` is not a label in the data, so it was built as the sum of New Delhi, Gurugram and Noida: **899 deals** (571 with an amount) raising about **$8.26B**. Other nearby cities such as Faridabad are not included.
-
-### Step 6: Top investors
-A deal can list several investors in one cell. The cell is split on commas so every investor gets credit for every deal they joined, and each investor is counted **once per deal**.
-```python
-tail = r'\s*(?:&|and)\s+(?:others?\b|existing\b|one more\b).*$'
-inv['investor'] = inv.investor.str.replace(tail, '', regex=True, case=False).str.strip()
-inv['investor'] = inv.investor.replace(inv_fix)     # merge name variants
-inv = inv.drop_duplicates(['sr_no', 'investor'])    # once per deal
-```
-Cleaning rules: generic endings (`& Others`, `and existing investors`) are removed; clear variants are merged (`Sequoia India`, `Sequoia Capital India` and `Sequoia` into `Sequoia Capital`; likewise Accel, Tiger Global, IDG Ventures, Matrix Partners); generic labels such as `Undisclosed` are dropped.
-
-| Rank | Investor | Deals |
-|---:|---|---:|
-| 1 | Sequoia Capital | 112 |
-| 2 | Accel Partners | 84 |
-| 3 | Tiger Global | 52 |
-| 4 | Blume Ventures | 51 |
-| 5 | Kalaari Capital | 51 |
-| 6 | SAIF Partners | 50 |
-| 7 | IDG Ventures | 46 |
-| 8 | Indian Angel Network | 43 |
-| 9 | Matrix Partners | 34 |
-| 10 | Ratan Tata | 31 |
-
-Merging name variants changed the ranking: Sequoia Capital rose from 72 to 112 deals and Tiger Global from 28 to 52.
-
-### Step 7: Funding by investment type
-`Unknown` investment types are excluded.
-
-| Investment type | Deals | With amount | Total funding | Median deal |
-|---|---:|---:|---:|---:|
-| Seed/Angel | 1,542 | 864 | $0.50B | $0.36M |
-| Private Equity | 1,367 | 1,082 | $27.40B | $6.00M |
-| Debt | 31 | 30 | $0.19B | $4.90M |
-| Series A | 24 | 22 | $0.16B | $4.00M |
-| Series B | 21 | 21 | $0.68B | $15.11M |
-| Series C | 14 | 14 | $0.60B | $44.04M |
-| Series D | 12 | 12 | $1.48B | $65.00M |
-| Other | 11 | 8 | $1.21B | $10.00M |
-| Pre-Series A | 9 | 8 | $0.02B | $2.50M |
-| Series E to J, Crowdfunding (combined) | 9 | 9 | $0.51B | not reliable |
-
-Series E to J have only 1 or 2 deals each, so they are not compared. The single Series J row is Ola Cabs ($1M, July 2019), which is only a small part of a larger round; the amount was left unchanged because it does not match a reported figure. The median-by-stage chart therefore shows only **Seed/Angel and Series A to D**, and leaves out the mixed `Private Equity` group.
-
-### Step 8: Top startups
-The same startup can appear under several spellings, which would split its total across rows. Names that differ only by capital letters, spaces, punctuation or endings such as `.com` and `Pvt Ltd` were reduced to a key and mapped to the most common spelling in a **new column** `startup_clean`.
-```python
-def name_key(s):
-    s = re.sub(r'\.com|\.in|\bpvt\b|\bltd\b|\bprivate\b|\blimited\b', '', s.lower())
-    return re.sub(r'[^a-z0-9]', '', s)
-
-canon = names.groupby('key').startup_name.agg(lambda x: x.value_counts().idxmax())
-df['startup_clean'] = names.key.map(canon)
-```
-**189 startups** appeared under more than one spelling. Names with different words were merged by hand (`Ola Cabs` into `Ola`, `OYO Rooms` and `Oyo` into `OYO`). `Ola Electric`, `OYOfit` and `Paytm Marketplace` are different companies or business units and stay separate. Unique names fell from **2,457 to 2,242**.
-
-`True North` ($600M) was excluded from the ranking because it is a private equity fund raise, not startup funding.
-
-| Rank | Startup | Deals | With amount | Total funding |
-|---:|---|---:|---:|---:|
-| 1 | Flipkart | 6 | 6 | $4.76B |
-| 2 | Paytm | 7 | 5 | $3.15B |
-| 3 | Ola | 13 | 12 | $2.05B |
-| 4 | OYO | 9 | 9 | $1.00B |
-| 5 | Udaan | 4 | 4 | $0.87B |
-| 6 | Snapdeal | 2 | 2 | $0.70B |
-| 7 | Byju’s | 7 | 6 | $0.53B |
-| 8 | BigBasket | 5 | 5 | $0.51B |
-| 9 | Zomato | 4 | 4 | $0.44B |
-| 10 | PolicyBazaar | 4 | 4 | $0.34B |
-
-### Step 9: Export
-```python
-final_cols = ['sr_no', 'date', 'year', 'startup_name', 'startup_clean', 'industry',
-              'subvertical', 'city', 'city_clean', 'investors', 'investment_type',
-              'amount_usd', 'amount_original', 'amount_fixed', 'outlier_after_fix', 'remarks']
-df[final_cols].to_csv('startup_funding_eda.csv', index=False)     # (3044, 16)
-```
-Helper columns used only during the review (`suspect`, `outlier`, `to_verify`) are not exported. `outlier_after_fix` is kept as the final flag.
+**2.6 Re-check after the fixes.** The same IQR rule was run again and saved in a new column `outlier_after_fix`, so the first flags stay visible. **110 rows** remain flagged after corrections.
 
 ---
 
@@ -311,13 +189,13 @@ Helper columns used only during the review (`suspect`, `outlier`, `to_verify`) a
 
 | # | Finding |
 |---|---|
-| 1 | **Fewer, bigger deals.** Deals fell from 993 (2016) to 111 (2019), while the median deal size rose from $1.0M to $6.2M. Total funding peaked in 2017 ($10.4B) because of a few very large deals, then fell to about $5B in 2018 and 2019 |
-| 2 | **Funding is concentrated by industry.** eCommerce ($8.0B) and Consumer Internet ($6.3B) hold about 68% of the top-10 industry funding. Consumer Internet has the most deals (941) but a median of only $1.0M, so it is many small deals. FinTech (median $10M), Finance ($6M) and Logistics ($6M) have fewer but larger deals |
-| 3 | **Bengaluru leads by money, Delhi NCR by deal count.** Bengaluru raised about $14.6B, roughly half of the top-10 city total ($29.7B). Delhi NCR (New Delhi, Gurugram and Noida together) has more deals than Bengaluru (899 vs 851) but raised less ($8.3B vs $14.6B). Median deals are $1.0M to $2.5M in all ten cities, so Bengaluru's lead comes mostly from a few very large deals, not from a higher typical deal |
-| 4 | **Stage drives deal size.** The median rises from $0.36M (Seed/Angel) to $4.0M (Series A), $15.1M (Series B), $44.0M (Series C) and $65.0M (Series D). Private Equity holds about 84% of total funding ($27.4B of $32.8B); Seed/Angel has the most deals (1,542) but only about 1.5% of the money |
-| 5 | **Most active investors.** Sequoia Capital (112 deals) and Accel Partners (84) lead, well ahead of Tiger Global (52). Individual angels such as Ratan Tata (31) rank alongside venture funds |
-| 6 | **Top funded startups.** Flipkart ($4.76B), Paytm ($3.15B) and Ola ($2.05B) hold about 69% of the top-10 startup funding ($9.96B of $14.35B). Ola has the most deals (13), but Flipkart raised more in only 6 |
-| 7 | **Data quality changed the story.** Correcting 11 amounts removed about $5.4B from the total. Without this step, Rapido Bike Taxi would have appeared as the single largest deal in the dataset |
+| 1 | **Fewer, bigger deals.** Deals fell from 993 (2016) to 111 (2019), while the median deal size rose from $1.0M to $6.2M. Total funding peaked in 2017 ($10.4B) because of a few very large deals. |
+| 2 | **Funding is concentrated by industry.** eCommerce ($8.0B) and Consumer Internet ($6.3B) hold about 68% of the top-10 industry funding. |
+| 3 | **Bengaluru leads by money, Delhi NCR by deal count.** Bengaluru raised about $14.6B, roughly half of the top-10 city total. |
+| 4 | **Stage drives deal size.** The median rises from $0.36M (Seed/Angel) to $4.0M (Series A), $15.1M (Series B), $44.0M (Series C) and $65.0M (Series D). |
+| 5 | **Most active investors.** Sequoia Capital (112 deals) and Accel Partners (84) lead, well ahead of Tiger Global (52). |
+| 6 | **Top funded startups.** Flipkart ($4.76B), Paytm ($3.15B) and Ola ($2.05B) hold about 69% of the top-10 startup funding. |
+| 7 | **Data quality changed the story.** Correcting 11 amounts removed about $5.4B from the total. |
 
 ---
 
@@ -331,13 +209,7 @@ Helper columns used only during the review (`suspect`, `outlier`, `to_verify`) a
 | Median deal size | $1.75M | $1.70M |
 | Largest single deal | $3.9B (Rapido Bike Taxi) | $2.5B (Flipkart, Aug 2017) |
 | Rows flagged as outliers | 118 | 110 |
-| Wrong amounts corrected | 0 | 11 (original kept in `amount_original`) |
-| Unique startup names | 2,457 | 2,242 |
-| Unique city labels (incl. `Unknown`) | 77 | 67 |
-| Missing `amount_usd` | 971 | 971 (not imputed) |
-| Duplicate rows | 0 | 0 |
-
-> **Why the mean fell more than the median:** the median is robust to extreme values, so removing eleven inflated amounts barely moves it ($1.75M to $1.70M). The mean is pulled up by large values, so it drops by about $2.6M. This is the reason the analysis reports medians next to totals.
+| Wrong amounts corrected | 0 | 11 |
 
 ---
 
@@ -347,51 +219,43 @@ Helper columns used only during the review (`suspect`, `outlier`, `to_verify`) a
 |---|---|---|
 | `sr_no` | int | Original serial number |
 | `date` | datetime | Date of the funding round |
-| `year` | int | Year taken from `date` (new) |
-| `startup_name` | text | Company name as in the cleaned source (unchanged) |
-| `startup_clean` | text | Startup name with spelling variants merged (new) |
-| `industry` | text | Industry vertical (`Unknown` if blank) |
-| `subvertical` | text | More specific business description (`Not provided` if blank) |
-| `city` | text | City as in the cleaned source (unchanged) |
-| `city_clean` | text | City with typos, neighbourhoods and codes merged (new) |
-| `investors` | text | Investor name(s) (`Undisclosed` if blank) |
-| `investment_type` | text | Standardised round type (16 categories) |
-| `amount_usd` | float | Funding amount in USD **after correction** (`NaN` if undisclosed) |
-| `amount_original` | float | Funding amount before any correction (new) |
-| `amount_fixed` | bool | `True` for the 11 rows whose amount was corrected (new) |
-| `outlier_after_fix` | bool | `True` if the amount is above Q3 + 3 × IQR of its investment type, after corrections (new) |
-| `remarks` | text | Extra notes (`Not provided` if blank) |
+| `year` | int | Year taken from `date` |
+| `startup_name` | text | Company name as in the cleaned source |
+| `startup_clean` | text | Startup name with spelling variants merged |
+| `industry` | text | Industry vertical |
+| `subvertical` | text | More specific business description |
+| `city` | text | City as in the cleaned source |
+| `city_clean` | text | City with typos and variants merged |
+| `investors` | text | Investor name(s) |
+| `investment_type` | text | Standardised round type |
+| `amount_usd` | float | Funding amount in USD after correction |
+| `amount_original` | float | Funding amount before correction |
+| `amount_fixed` | bool | Whether the amount was corrected |
+| `outlier_after_fix` | bool | Whether the amount remains an outlier |
+| `remarks` | text | Additional notes |
 
 ---
 
 ## 9. Decisions & Assumptions
 
-- **Outliers are flagged, not deleted.** A row is changed only when public news reports confirm the correct amount. Large but real deals (Flipkart, Paytm, Udaan) stay in the data.
-- **The IQR rule runs within each investment type,** with a multiplier of 3. A $50M seed round and a $50M Series C are not the same kind of event, so a flat cut-off would be unfair.
-- **Every change is traceable.** The original amount is kept in `amount_original`, the corrected rows are marked in `amount_fixed`, and the original `startup_name` and `city` columns are kept next to their cleaned versions.
-- **The median is reported next to the total** everywhere, because a few very large deals dominate the totals.
-- **Amounts were not imputed.** An undisclosed amount is a fact about the deal, not an error to fill. Instead, the share of missing amounts is shown wherever totals are compared.
-- **Minimum sample size:** industries and cities are ranked only if they have at least 10 deals with an amount. `Unknown` labels are excluded from those rankings.
-- **Delhi NCR** is defined as New Delhi + Gurugram + Noida. This is an analysis choice, not a label in the data.
-- **Each investor gets credit for every deal they joined,** counted once per deal. The ranking is by number of deals, not by amount invested.
-- **Rounds beyond Series D are not compared,** and `Private Equity` is left out of the stage chart because it mixes very different deals.
-- **`Ola Electric`, `OYOfit` and `Paytm Marketplace` are kept separate** from their parent brands because they are different companies or business units.
-- **`True North` is excluded from the startup ranking** because it is a private equity fund raise, not startup funding.
+- **Outliers are flagged, not deleted.** A row is changed only when public news reports confirm the correct amount.
+- **The IQR rule runs within each investment type.**
+- **Keep the original next to the fix.**
+- **The median is reported next to the total** because a few very large deals dominate totals.
+- **Amounts were not imputed.**
+- **Minimum sample size:** industries and cities are ranked only if they have at least 10 deals with an amount.
+- **Delhi NCR** is defined as New Delhi + Gurugram + Noida.
+- **Each investor gets credit for every deal they joined.**
 
 ---
 
 ## 10. Limitations
 
-- **About 32% of `amount_usd` is missing** (971 rows), so all totals are understated, and 2016 is affected most (41% missing).
-- **Smaller amount errors may remain.** Only the extreme cases flagged by the IQR rule and the manual review were checked. The 11 corrections rest on public news reports from 2018 and 2019.
-- **2020 contains only January** (7 deals), so it cannot be compared with full years.
-- **The fall in deal count after 2016 may partly reflect how the data was collected,** not only the market.
-- **Industry labels are free text,** so similar labels such as `EdTech` and `Education` are not merged and about 800 labels remain.
-- **Startup names with different words may remain split.** Spelling variants were merged for all startups, but only Ola and OYO were merged by hand.
-- **Investor names are not fully standardised.** Only the clear variants were merged, and labels that join two named investors (for example `Premji Invest & Mayfield Fund`) were not split, so those investors are slightly undercounted.
-- **Some `Private Equity` rows may be fund raises,** not startup funding (`True North` was excluded, others may remain).
-- **Cities with two names or only a state** (for example `Karnataka`) were not assigned to a city.
-- **Series E to J** have only 1 or 2 deals each, so their medians are not reliable.
+- About 32% of `amount_usd` is missing (971 rows), so totals are understated.
+- Smaller amount errors may remain.
+- 2020 contains only January, so it is not comparable to full years.
+- Industry labels are free text and are not fully standardized.
+- Some startup and investor names may remain split by spelling variation.
 
 ---
 
@@ -400,32 +264,30 @@ Helper columns used only during the review (`suspect`, `outlier`, `to_verify`) a
 1. Clone this repository.
 2. Upload `cleaned_startup_funding.csv` (the Task 1 output) to Google Drive.
 3. Open `Indian_Startup_Funding_Exploratory_Data_Analysis.ipynb` in Google Colab.
-4. Update the file paths in the load cell (Step 1) and the export cell (Step 9) to match your Drive.
-5. Run all cells (**Runtime → Run all**), in order, because later cells depend on columns created earlier (`outlier`, `to_verify`, `amount_original`, `city_clean`, `startup_clean`).
+4. Update the file paths in the load cell.
+5. Run all cells in order.
 6. The final table is written as `startup_funding_eda.csv`.
 
-**Requirements:** Python 3, `pandas`, `matplotlib`. The Drive mount and the download call are Colab-specific; outside Colab, replace them with local file paths.
+**Requirements:** Python 3, `pandas`, `matplotlib`.
 
 ---
 
 ## 12. Key Learnings
 
-- **Check the data before trusting the totals.** One wrong value ($3.9B for a $54M deal) was enough to change the top of every ranking.
-- **A single cut-off does not fit every group.** Applying the outlier rule within each investment type found errors that a flat $100M limit would have missed, and avoided flagging normal late-stage deals.
-- **Flag first, decide second.** A statistical flag is a reason to look, not a reason to delete; the decision was made only after reading the news reports.
-- **Keep the original next to the fix.** Adding `amount_original` and `amount_fixed` makes every correction reviewable.
-- **Use the median for skewed money data,** and show how much of the data is missing next to every total.
-- **Know when a sample is too small to compare.** Rounds with 1 or 2 deals do not have a reliable median, so they were described, not ranked.
-- **Name variants hide real results.** Merging investor and startup spellings changed the rankings (Sequoia Capital 72 to 112 deals).
-- **Every finding needs a caveat.** Writing the limitation next to the result keeps the conclusions honest.
+- **Check the data before trusting the totals.**
+- **A single cut-off does not fit every group.**
+- **Flag first, decide second.**
+- **Keep the original next to the fix.**
+- **Use the median for skewed money data.**
+- **Name variants hide real results.**
 
 ---
 
 ## 13. Next Steps
 
-- Build an **interactive dashboard** (Power BI, Tableau or another BI tool) on `startup_funding_eda.csv`, with filters for year, industry, city and investment type.
-- Show the share of missing amounts on the dashboard, so that totals are not read as complete.
-- Merge the remaining industry labels (for example `EdTech` and `Education`) if the dashboard needs fewer categories.
+- Build an interactive dashboard on `startup_funding_eda.csv`.
+- Add missing-amount indicators to charts so totals are not misread as complete.
+- Merge remaining industry labels such as `EdTech` and `Education` for cleaner segmentation.
 
 ---
 
