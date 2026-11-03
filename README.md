@@ -75,21 +75,24 @@ SWYNEX-Startup-Funding-EDA/
 
 These charts summarize the core findings from the notebook and are added here for quick visibility in the repository.
 
-### Year-wise total funding
 
-![Year-wise total funding](images/yearly_funding.svg)
+### Yearly trend: deals, total funding and median deal size
+![Yearly trend](images/01_yearly_trend.png)
 
-### Top cities by funding
+### Top 10 industries by total funding
+![Top industries](images/02_top_industries.png)
 
-![Top cities by funding](images/top_cities.svg)
+### Top 10 cities by total funding
+![Top cities](images/03_top_cities.png)
 
-### Top industries by funding
+### Top 10 investors by number of deals
+![Top investors](images/04_top_investors.png)
 
-![Top industries by funding](images/top_industries.svg)
+### Median deal size by funding stage
+![Median deal size by stage](images/05_median_by_stage.png)
 
-### Top investors by number of deals
-
-![Top investors by number of deals](images/top_investors.svg)
+### Top 10 startups by total funding
+![Top startups](images/06_top_startups.png)
 
 ---
 
